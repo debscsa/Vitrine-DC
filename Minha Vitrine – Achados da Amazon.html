@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Minha Vitrine – Achados da Amazon</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f6f8f7;--card:#fff;--ink:#14302c;--mute:#5b706c;--line:#d8e2df;--brand:#0f6b5c;--cta:#f2a900;--cta-ink:#2b1d00;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1b19;--card:#162826;--ink:#e8f1ef;--mute:#9bb3ae;--line:#274340;--brand:#4fc3ad;--cta:#f2b632;--cta-ink:#2b1d00}}
+:root[data-theme="dark"]{--bg:#0e1b19;--card:#162826;--ink:#e8f1ef;--mute:#9bb3ae;--line:#274340;--brand:#4fc3ad;--cta:#f2b632;--cta-ink:#2b1d00}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.5 "Bricolage Grotesque",system-ui,sans-serif}
+header{max-width:960px;margin:0 auto;padding:40px 20px 16px}
+h1{font-size:clamp(2rem,6vw,3.2rem);line-height:1.05;margin:0 0 10px;font-weight:800;letter-spacing:-.02em}
+header p{margin:0;color:var(--mute);max-width:52ch}
+.chips{max-width:960px;margin:0 auto;padding:12px 20px;display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 14px;border-radius:99px;font:inherit;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:#fff}
+.chip:focus-visible,.buy:focus-visible{outline:3px solid var(--cta);outline-offset:2px}
+main{max-width:960px;margin:0 auto;padding:8px 20px 24px;display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:10px}
+.pic{height:120px;border-radius:10px;background:var(--bg);display:grid;place-items:center;font-size:3.4rem}
+.card h2{font-size:1.1rem;margin:0;font-weight:600}
+.card p{margin:0;color:var(--mute);font-size:.95rem;flex:1}
+.price{font-weight:800}
+.buy{display:block;text-align:center;text-decoration:none;background:var(--cta);color:var(--cta-ink);font-weight:800;padding:12px;border-radius:10px}
+.buy:hover{filter:brightness(1.05)}
+footer{max-width:960px;margin:0 auto;padding:16px 20px 40px;color:var(--mute);font-size:.85rem;border-top:1px solid var(--line)}
+</style>
+</head>
+<body>
+<header>
+  <h1>Achados que eu realmente indico</h1>
+  <p>Uma seleção de produtos da Amazon que valem a pena. Toque no produto para ver preço e avaliações atualizados.</p>
+</header>
+<nav class="chips" id="chips" aria-label="Categorias"></nav>
+<main id="grid"></main>
+<footer>Como Associada da Amazon, recebo comissão por compras qualificadas feitas pelos links desta página, sem custo extra para você. Preços e disponibilidade podem mudar na Amazon.</footer>
+
+<script>
+/* ====== EDITE AQUI ======
+   Para cada produto: nome, descrição curta, categoria, emoji (ou deixe vazio) e o SEU link de afiliado da Amazon. */
+const PRODUTOS = [
+  {nome:"Garrafa térmica 1L", desc:"Mantém a bebida gelada por horas. Ótima para aulas e plantões.", cat:"Dia a dia", emoji:"🧴", link:"https://www.amazon.com.br/dp/XXXXXXXXXX?tag=SEU-ID-20"},
+  {nome:"Fone de ouvido bluetooth", desc:"Leve, com bom microfone e bateria que dura o dia todo.", cat:"Tecnologia", emoji:"🎧", link:"https://www.amazon.com.br/dp/XXXXXXXXXX?tag=SEU-ID-20"},
+  {nome:"Caderno universitário", desc:"Capa dura e folhas grossas, bom para resumos e mapas mentais.", cat:"Estudos", emoji:"📓", link:"https://www.amazon.com.br/dp/XXXXXXXXXX?tag=SEU-ID-20"},
+  {nome:"Luminária de mesa LED", desc:"Três intensidades de luz, ideal para estudar à noite.", cat:"Estudos", emoji:"💡", link:"https://www.amazon.com.br/dp/XXXXXXXXXX?tag=SEU-ID-20"},
+  {nome:"Mochila resistente", desc:"Compartimento para notebook e tecido que aguenta chuva leve.", cat:"Dia a dia", emoji:"🎒", link:"https://www.amazon.com.br/dp/XXXXXXXXXX?tag=SEU-ID-20"},
+  {nome:"Suporte para notebook", desc:"Ajusta a altura da tela e ajuda a manter a postura.", cat:"Tecnologia", emoji:"💻", link:"https://www.amazon.com.br/dp/XXXXXXXXXX?tag=SEU-ID-20"}
+];
+/* ====== FIM DA ÁREA DE EDIÇÃO ====== */
+
+const grid=document.getElementById('grid'), chips=document.getElementById('chips');
+const cats=['Todos',...new Set(PRODUTOS.map(p=>p.cat))];
+let atual='Todos';
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function render(){
+  chips.innerHTML=cats.map(c=>`<button class="chip" aria-pressed="${c===atual}" data-c="${esc(c)}">${esc(c)}</button>`).join('');
+  grid.innerHTML=PRODUTOS.filter(p=>atual==='Todos'||p.cat===atual).map(p=>`
+    <article class="card">
+      <div class="pic" aria-hidden="true">${esc(p.emoji||'🛍️')}</div>
+      <h2>${esc(p.nome)}</h2>
+      <p>${esc(p.desc)}</p>
+      <a class="buy" href="${esc(p.link)}" target="_blank" rel="sponsored noopener">Ver na Amazon</a>
+    </article>`).join('');
+}
+chips.addEventListener('click',e=>{const b=e.target.closest('.chip');if(b){atual=b.dataset.c;render()}});
+render();
+</script>
+</body>
+</html>
